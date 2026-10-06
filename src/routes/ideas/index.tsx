@@ -25,10 +25,10 @@ export const Route = createFileRoute('/ideas/')({
 })
 
 function IdeasPage() {
-  const { data: ideas } = useSuspenseQuery(ideasQueryOptions());
+  const { data } = useSuspenseQuery(ideasQueryOptions());
+  const ideas = [...data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
-    <>
       <div className='p-4'>
         <h1 className='text-2xl font-bold mb-4'>Ideas</h1>
         <div className='grid grid-cols-1 sm:grid-cols-2 gaps-6'>
@@ -37,6 +37,5 @@ function IdeasPage() {
           ))}
         </div>
       </div>
-    </>
   )
 }

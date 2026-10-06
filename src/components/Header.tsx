@@ -3,7 +3,6 @@ import { Lightbulb } from "lucide-react";
 
 const Header = () => {
   return (
-    <>
       <header className="bg-gray-50 shadow">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2 text-gray-800">
@@ -23,7 +22,6 @@ const Header = () => {
           </nav>
         </div>
       </header>
-    </>
   );
 };
 

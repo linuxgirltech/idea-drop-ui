@@ -1,61 +1,69 @@
-import { createFileRoute, useNavigate, } from '@tanstack/react-router';
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import {
+  useMutation,
+  useSuspenseQuery,
+  queryOptions,
+} from "@tanstack/react-query";
+import { useState } from "react";
 
 import clsx from 'clsx';
 
-import { createIdea } from '@/api/ideas';
+import { fetchIdea, updateIdea } from "@/api/ideas";
 
-export const Route = createFileRoute('/ideas/new/')({
-  component: NewIdeasPage,
-})
+const ideaQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: ["idea", id],
+    queryFn: () => fetchIdea(id),
+  });
 
-function NewIdeasPage() {
+export const Route = createFileRoute("/ideas/$ideaId/edit")({
+  component: IdeaEditPage,
+  loader: async ({ params, context: { queryClient } }) => {
+    queryClient.query(ideaQueryOptions(params.ideaId))
+  }
+});
+
+function IdeaEditPage() {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState('');
+  const { ideaId } = Route.useParams();
+  const { data: idea } = useSuspenseQuery(ideaQueryOptions(ideaId));
+
+  const [title, setTitle] = useState(idea.title);
+  const [summary, setSummary] = useState(idea.summary);
+  const [description, setDescription] = useState(idea.description);
+  const [tagsInput, setTagsInput] = useState(idea.tags.join(', '));
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: createIdea,
+    mutationFn: () => updateIdea(ideaId, {
+      title,
+      summary,
+      description,
+      tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean)
+    }),
     onSuccess: () => {
-      navigate({to: '/ideas'})
+      navigate({ to: '/ideas/$ideaId', params: { ideaId } })
     }
+  });
+
+  const buttonView = clsx({
+    'Updating...': isPending,
+    'Update': !isPending,
   });
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !summary.trim() || !description.trim()) {
-      alert('Please fill in all required fields!');
-      return;
-    }
-
-    try {
-      await mutateAsync({
-        title,
-        summary,
-        description,
-        tags: tags.split(',').map((tag) => tag.trim()).filter((tag) => tag !== '')
-      })
-    } catch (err) {
-      console.error(err)
-      alert('Something went wrong')
-    }
+    await mutateAsync();
   }
-
-  const buttonView = clsx({
-    'Creating Idea...': isPending,
-    'Create Idea': !isPending
-  });
 
   return (
     <div className='space-y-6 p-4'>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Create New Idea</h1>
+        <h1 className="text-2xl font-bold">Edit Idea</h1>
+        <Link to='/ideas/$ideaId' params={{ ideaId }} className="text-sm text-blue-600 hover:underline">← Back to Idea</Link>
       </div>
-      <form onSubmit={handleSubmit} className='space-y-2'>
+      <h1 className='text-3xl font-bold mb-6'>Create New Idea</h1>
+      <form onSubmit={handleSubmit} className='space-y-2 p-2'>
         <div>
           <label htmlFor='title' className='block text-gray-700 font-medium mb-1'>Title</label>
           <input
@@ -96,8 +104,8 @@ function NewIdeasPage() {
           <input
             id='tags'
             type='text'
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
             className='w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
             placeholder='Optional: Enter Tags, comma seperated'
           />
@@ -106,12 +114,11 @@ function NewIdeasPage() {
         <div className='mt-5'>
           <button
             type='submit'
-            disabled={ isPending }
             className='block w-full bg-blue-600 hover:bg-blue-800 text-gray-50
             font-semibold px-6 py-2 rounded-md transition
             disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            { buttonView }
+            {buttonView}
           </button>
         </div>
       </form>

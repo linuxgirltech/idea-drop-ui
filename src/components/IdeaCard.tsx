@@ -15,7 +15,6 @@ const IdeaCard = ({ idea, button = true }: {idea: Idea, button?: boolean}) => {
   });
 
   return (
-    <>
       <div className='border border-gray-300 p-4 rounded bg-gray-100 flex flex-col justify-between'>
         <div>
           <h2 className='text-lg font-semibold'>{idea.title}</h2>
@@ -24,7 +23,6 @@ const IdeaCard = ({ idea, button = true }: {idea: Idea, button?: boolean}) => {
 
         <Link to='/ideas/$ideaId' params={{ ideaId: idea.id.toString() }} className={linkClasses}>{ buttonView }</Link>
       </div>
-    </>
   );
 };
 
