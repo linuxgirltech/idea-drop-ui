@@ -2,8 +2,10 @@ import api from "@/lib/axios";
 
 import type { Idea } from "@/types";
 
-export const fetchIdeas = async (): Promise<Idea[]> => {
-  const res = await api.get(`/ideas`);
+export const fetchIdeas = async (limit?: number): Promise<Idea[]> => {
+  const res = await api.get(`/ideas`, {
+    params: limit ? { _limit: limit } : {},
+  });
 
   return res.data;
 };
@@ -20,9 +22,9 @@ export const createIdea = async (newIdea: {
   description: string;
   tags: string[];
 }): Promise<Idea> => {
-  const res = await api.post('/ideas', {
+  const res = await api.post("/ideas", {
     ...newIdea,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   });
 
   return res.data;
@@ -30,15 +32,18 @@ export const createIdea = async (newIdea: {
 
 export const deleteIdea = async (id: string): Promise<void> => {
   await api.delete(`/ideas/${id}`);
-}
+};
 
-export const updateIdea = async (id: string, update: {
-  title: string;
-  sumamry: string;
-  description: string;
-  tags: string[];
-}): Promise<Idea> => {
+export const updateIdea = async (
+  id: string,
+  update: {
+    title: string;
+    sumamry: string;
+    description: string;
+    tags: string[];
+  },
+): Promise<Idea> => {
   const res = await api.put(`ideas/${id}`, update);
 
   return res.data;
-}
+};
