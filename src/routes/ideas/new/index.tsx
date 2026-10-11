@@ -1,34 +1,34 @@
-import { createFileRoute, useNavigate, } from '@tanstack/react-router';
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
-import clsx from 'clsx';
+import clsx from "clsx";
 
-import { createIdea } from '@/api/ideas';
+import { createIdea } from "@/api/ideas";
 
-export const Route = createFileRoute('/ideas/new/')({
+export const Route = createFileRoute("/ideas/new/")({
   component: NewIdeasPage,
-})
+});
 
 function NewIdeasPage() {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState('');
+  const [title, setTitle] = useState("");
+  const [summary, setSummary] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState("");
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: createIdea,
     onSuccess: () => {
-      navigate({to: '/ideas'})
-    }
+      navigate({ to: "/ideas" });
+    },
   });
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
     if (!title.trim() || !summary.trim() || !description.trim()) {
-      alert('Please fill in all required fields!');
+      alert("Please fill in all required fields!");
       return;
     }
 
@@ -37,81 +37,104 @@ function NewIdeasPage() {
         title,
         summary,
         description,
-        tags: tags.split(',').map((tag) => tag.trim()).filter((tag) => tag !== '')
-      })
+        tags: tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== ""),
+      });
     } catch (err) {
-      console.error(err)
-      alert('Something went wrong')
+      console.error(err);
+      alert("Something went wrong");
     }
-  }
+  };
 
-  const buttonView = clsx({
-    'Creating Idea...': isPending,
-    'Create Idea': !isPending
+  const createButtonView = clsx({
+    "Creating Idea...": isPending,
+    "Create Idea": !isPending,
   });
 
   return (
-    <div className='space-y-6 p-4'>
+    <div className="space-y-6 p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Create New Idea</h1>
       </div>
-      <form onSubmit={handleSubmit} className='space-y-2'>
+      <form onSubmit={handleSubmit} className="space-y-2">
         <div>
-          <label htmlFor='title' className='block text-gray-700 font-medium mb-1'>Title</label>
+          <label
+            htmlFor="title"
+            className="block text-gray-700 font-medium mb-1"
+          >
+            Title
+          </label>
           <input
-            id='title'
-            type='text'
+            id="title"
+            type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className='w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Enter idea title'
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter idea title"
           />
         </div>
 
         <div>
-          <label htmlFor='summary' className='block text-gray-700 font-medium mb-1'>Summary</label>
+          <label
+            htmlFor="summary"
+            className="block text-gray-700 font-medium mb-1"
+          >
+            Summary
+          </label>
           <input
-            id='summary'
-            type='text'
+            id="summary"
+            type="text"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            className='w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Enter idea summary'
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter idea summary"
           />
         </div>
 
         <div>
-          <label htmlFor='body' className='block text-gray-700 font-medium mb-1'>Description</label>
+          <label
+            htmlFor="body"
+            className="block text-gray-700 font-medium mb-1"
+          >
+            Description
+          </label>
           <textarea
-            id='body'
+            id="body"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className='w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Write out the description of your idea'
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Write out the description of your idea"
           />
         </div>
 
         <div>
-          <label htmlFor='tags' className='block text-gray-700 font-medium mb-1'>Tags</label>
+          <label
+            htmlFor="tags"
+            className="block text-gray-700 font-medium mb-1"
+          >
+            Tags
+          </label>
           <input
-            id='tags'
-            type='text'
+            id="tags"
+            type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className='w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Optional: Enter Tags, comma seperated'
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Optional: Enter Tags, comma seperated"
           />
         </div>
 
-        <div className='mt-5'>
+        <div className="mt-5">
           <button
-            type='submit'
-            disabled={ isPending }
-            className='block w-full bg-blue-600 hover:bg-blue-800 text-gray-50
+            type="submit"
+            disabled={isPending}
+            className="block w-full bg-blue-600 hover:bg-blue-800 text-gray-50
             font-semibold px-6 py-2 rounded-md transition
-            disabled:opacity-50 disabled:cursor-not-allowed'
+            disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            { buttonView }
+            {createButtonView}
           </button>
         </div>
       </form>

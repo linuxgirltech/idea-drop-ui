@@ -10,13 +10,13 @@ const IdeaCard = ({
   idea: Idea;
   button?: boolean;
 }) => {
-  const linkClasses = clsx({
+  const ideaLinkClasses = clsx({
     "text-center mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition":
       button,
     "text-blue-600 hover:underline mt-3": !button,
   });
 
-  const buttonView = clsx({
+  const ideaButtonView = clsx({
     "View Idea": button,
     "Read More →": !button,
   });
@@ -31,9 +31,9 @@ const IdeaCard = ({
       <Link
         to="/ideas/$ideaId"
         params={{ ideaId: idea._id.toString() }}
-        className={linkClasses}
+        className={ideaLinkClasses}
       >
-        {buttonView}
+        {ideaButtonView}
       </Link>
     </div>
   );
